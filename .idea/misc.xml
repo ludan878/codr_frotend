@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.32" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/drawable/codr_logo_background.xml" value="0.32" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/drawable/ic_baseline_call_split_24.xml" value="0.32" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/drawable/ic_baseline_chat_24.xml" value="0.32" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/drawable/ic_baseline_face_24.xml" value="0.32" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/drawable/ic_launcher_background.xml" value="0.32" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/layout/codrlogo.xml" value="0.3171875" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/layout/fragment_chatlist.xml" value="0.3171875" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/layout/fragment_login.xml" value="0.33732364258230013" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/layout/fragment_profile.xml" value="0.3171875" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/layout/fragment_register.xml" value="0.33732364258230013" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/layout/fragment_swipe.xml" value="0.3171875" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/layout/login_acitivty.xml" value="0.33" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/layout/row_item.xml" value="0.5" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/menu/bottom_menu.xml" value="0.3171875" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/mipmap-anydpi-v26/codr_logo.xml" value="0.5525" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/mipmap-anydpi-v26/codr_logo_round.xml" value="0.5525" />
+        <entry key="..\:/Users/Olof/Documents/GitHub/LIU/TDDD80_2022/codr-frontend/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.5525" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

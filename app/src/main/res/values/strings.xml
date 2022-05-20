@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Codr</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="profilepicture">Profilepicture</string>
+    <string name="logout">Logout</string>
+    <string name="default_username">username</string>
+    <string name="password_here">password here!</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+</resources>

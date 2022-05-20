@@ -1,0 +1,199 @@
+package com.ludan878merpa443.codr;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationRequest;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.CancellationToken;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnTokenCanceledListener;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.xml.datatype.Duration;
+
+public class MainActivity extends AppCompatActivity {
+
+    private static final int PERMISSION_LOCATION_REQUEST = 1;
+    ImageView imageView; // Declares an imageView
+    Button camera; // Declares a camera
+    TextView location; // Declares a location
+    String currentPhotoPath; // Declres currentphotopath
+    private FusedLocationProviderClient fusedLocationClient;
+    ActivityResultLauncher<Intent> resultLauncher; // Creates a List of Intents
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        /*
+        Creates the viewable part of the application. On successfully creation of picture it will provide the picture
+        taken along with an approximate location.
+         */
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        reqPerms();
+        imageView = findViewById(R.id.imageView);
+        camera = findViewById(R.id.camera);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        location = findViewById(R.id.location);
+        resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                Intent data = result.getData();
+
+                Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                imageView.setImageBitmap(imageBitmap);
+                setLocation();
+                setCoolText();
+            }
+        });
+
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (reqPerms()) {
+                    dispatchTakePictureIntent();
+                } else {
+                    Toast.makeText(getApplicationContext(),"Give perms b4 use", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+    /*
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
+
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            imageView.setImageBitmap(imageBitmap);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            setLocation();
+            setCoolText();
+        }
+    }*/
+
+    @SuppressLint("SetTextI18n")
+    private void setCoolText() {
+        camera.setText("This you?"); // Sets a text asking if this is you?
+    }
+
+    private boolean reqPerms() {
+        /* Checks if the application gets the right permission if not asks for it. */
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA}, PERMISSION_LOCATION_REQUEST);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void setLocation() {
+        /* On successfully creation of a picture this function gets called, gathering data from gps getting a longitude
+        and a latitude converting it into an address. Lastly displays it at the screen.
+         */
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_LOCATION_REQUEST);
+            return;
+        }
+
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onSuccess(Location loc) {
+                double latisak = loc.getLatitude();
+                double longisak = loc.getLongitude();
+                Geocoder gc = new Geocoder(getApplicationContext());
+                List<Address> loca = null;
+                try {
+                    loca = gc.getFromLocation(latisak, longisak, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String locationString = loca.get(0).getAddressLine(0);
+                location.setText(locationString + "\n"+longisak+" " + latisak);
+            }
+        });
+    }
+
+    private void dispatchTakePictureIntent() {
+        /* Starts an Intent containing a camera. Trying to save it as a file, if successfully launches the picture */
+        Intent picIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (picIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                resultLauncher.launch(picIntent);
+            }
+        }
+    }
+
+
+    private File createImageFile() throws IOException {
+        // Create an image file
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,
+                ".jpg",
+                storageDir
+        );
+
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+
+}
