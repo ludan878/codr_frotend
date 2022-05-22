@@ -1,5 +1,7 @@
 package com.ludan878merpa443.codr;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -8,12 +10,26 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginFragment extends Fragment {
     // Init variables
@@ -37,6 +53,12 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        sessionManager = new SessionManager(getContext());
+        /*if (sessionManager.getLogin()) {
+            Intent mainIntent = new Intent(getActivity(), MainActivity.class);
+            startActivity(mainIntent);
+        }*/
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
@@ -49,9 +71,6 @@ public class LoginFragment extends Fragment {
         edittext_email = getActivity().findViewById(R.id.edittext_email);
         edittext_password = getActivity().findViewById(R.id.edittext_password);
 
-        //Init SessionManager
-        sessionManager = new SessionManager(getContext());
-
         button_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,20 +78,8 @@ public class LoginFragment extends Fragment {
                 String email = edittext_email.getText().toString().trim();
                 String password = edittext_password.getText().toString().trim();
 
-                if(password.equals("")){
-                    edittext_password.setError("Please enter password");
-                }
-                if(password.equals("root")){ // CHECK PASSWORD HERE instead of \\password.equals
-                    //Store login in session
-                    sessionManager.setLogin(true);
-                    //Store username in session
-                    sessionManager.setEmail(email);
-                    // Start mainactivity
-                    startActivity(new Intent(getContext(), MainActivity.class));
-                    getActivity().finish();
-                } else {
-                    Toast.makeText(getContext(), "Wrong password", Toast.LENGTH_SHORT).show();
-                }
+                login_user(email, password);
+
             }
         });
         button_register.setOnClickListener(new View.OnClickListener() {
@@ -93,5 +100,44 @@ public class LoginFragment extends Fragment {
         });
 
 
+    }
+
+    private void login_user(String email, String password) {
+        String url = "http://codrrip.herokuapp.com/login";
+
+        Map<String, String> params = new HashMap();
+        params.put("password", password);
+        params.put("email", email);
+
+        JSONObject jsonParams = new JSONObject(params);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+
+        JsonObjectRequest postReq = new JsonObjectRequest(Request.Method.POST, url, jsonParams, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                sessionManager.setEmail(email);
+                try {
+                    sessionManager.setToken(response.getString("access-token"));
+                    Log.d(TAG, "onResponse: "+sessionManager.getToken());
+                    sessionManager.setLogin(true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    // TODO: handle fail
+                }
+
+                Intent mainIntent = new Intent(getActivity(), MainActivity.class);
+                startActivity(mainIntent);
+
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, error.toString());
+            }
+        });
+        requestQueue.add(postReq);
     }
 }

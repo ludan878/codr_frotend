@@ -1,58 +1,73 @@
 package com.ludan878merpa443.codr;
 
+import static android.content.ContentValues.TAG;
+
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SwipeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class SwipeFragment extends Fragment {
+    private SessionManager sessionManager;
+    private TextView userName;
+    private TextView userDescription;
+    private TextView userAge;
+    private ImageView userImage;
+    private Button btnNo;
+    private Button btnYes;
+    private StorageReference storageReference;
+    private boolean choice;
+    private ArrayList<JSONObject> users;
+    int currentUserNum;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public SwipeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SwipeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static SwipeFragment newInstance(String param1, String param2) {
         SwipeFragment fragment = new SwipeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+
     }
 
     @Override
@@ -60,5 +75,124 @@ public class SwipeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_swipe, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View v, Bundle savedInstanceState) {
+        storageReference = FirebaseStorage.getInstance().getReference();
+        sessionManager = new SessionManager(getContext());
+        users = new ArrayList<>();
+        btnNo = getActivity().findViewById(R.id.btnNo);
+        btnYes = getActivity().findViewById(R.id.btnYes);
+        userName = getActivity().findViewById(R.id.tv_username);
+        userDescription = getActivity().findViewById(R.id.tv_d);
+        userImage = getActivity().findViewById(R.id.ivPfp);
+        choice = false;
+        getUserList();
+        btnNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nextUser();
+            }
+        });
+        btnYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    likeUser(sessionManager.getCurrent());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+
+    private void likeUser(String user_id) throws JSONException {
+        String url = "http://codrrip.herokuapp.com/user/like";
+
+        Map<String, String> params = new HashMap();
+        params.put("target", user_id);
+
+        JSONObject jsonParams = new JSONObject(params);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+
+        JsonObjectRequest postReq = new JsonObjectRequest(Request.Method.POST, url, jsonParams, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(TAG, "onResponse: Success");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, error.toString());
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap();
+                headers.put("Authorization", "Bearer "+sessionManager.getToken());
+                return headers;
+            }
+        };
+        requestQueue.add(postReq);
+    }
+
+    private void nextUser() {
+        currentUserNum ++;
+        getUserList();
+    }
+
+
+    private void getUserList(){
+        String url = "http://codrrip.herokuapp.com/users";
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+        JsonArrayRequest getReq = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                String uName = null;
+                String uDesc = null;
+                try {
+                    String pfp = response.getJSONObject(currentUserNum%response.length()).getString("pfp");
+                    uName = response.getJSONObject(currentUserNum%response.length()).getString("user_id");
+                    uDesc = response.getJSONObject(currentUserNum%response.length()).getString("desc");
+                    setImage(pfp);
+                } catch (JSONException | IOException e) {
+                    e.printStackTrace();
+                }
+                sessionManager.setCurrent(uName);
+                userName.setText(uName);
+                userDescription.setText(uDesc);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, error.toString());
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap();
+                headers.put("Authorization", "Bearer "+sessionManager.getToken());
+                return headers;
+            }
+        };
+        requestQueue.add(getReq);
+    }
+
+    private void setImage(String filename) throws IOException {
+        StorageReference imgReference = storageReference.child("images/"+filename);
+        imgReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri u) {
+                Glide.with(getContext()).load(u).into(userImage);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                exception.printStackTrace();
+            }
+        });
     }
 }

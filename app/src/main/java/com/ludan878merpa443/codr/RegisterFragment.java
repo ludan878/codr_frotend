@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -33,7 +34,15 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -41,6 +50,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,7 +61,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class RegisterFragment extends Fragment {
     private final int REQUEST_CODE = 1101;
@@ -58,11 +71,12 @@ public class RegisterFragment extends Fragment {
     private EditText edt_name;
     private EditText edt_email;
     private EditText edt_password;
-    private ImageView imgProf;
+    private EditText edt_rpt_password;
     private String currentPhotoPath;
     private StorageReference storageReference;
     private SessionManager sessionManager;
     private Uri profUri;
+    private Button btnReg;
     ActivityResultLauncher<Intent> resultLauncher; // Creates a List of Intents
     public RegisterFragment() {
         // Required empty public constructor
@@ -84,113 +98,76 @@ public class RegisterFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         sessionManager = new SessionManager(getContext());
+        btnReg = getActivity().findViewById(R.id.button_reg);
         edt_email = getActivity().findViewById(R.id.edtEmail);
         edt_name = getActivity().findViewById(R.id.edtUsername);
         edt_password = getActivity().findViewById(R.id.editTextTextPassword);
-        profPicButton = getActivity().findViewById(R.id.imageButton);
-        storageReference = FirebaseStorage.getInstance().getReference();
-        resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-            @Override
-            public void onActivityResult(ActivityResult result) {
-                Intent data = result.getData();
-                Uri uri;
-                if (data != null) {
-                    uri = data.getData();
-                    uploadFile(uri);
-                }
-            }
-        });
-        profPicButton.setOnClickListener(new View.OnClickListener() {
+        edt_rpt_password = getActivity().findViewById(R.id.edtRepeatPassword);
+        btnReg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dispatchTakePictureIntent();
-            }
-        });
+                String usr = edt_name.getText().toString();
+                String pass1 = edt_password.getText().toString();
+                String pass2 = edt_rpt_password.getText().toString();
+                String email = edt_email.getText().toString();
 
-
-    }
-
-
-
-    private void dispatchTakePictureIntent() {
-        Intent picIntent = new Intent();
-        picIntent.setType("image/*");
-        picIntent.setAction(Intent.ACTION_GET_CONTENT);
-        picIntent.addCategory(Intent.CATEGORY_OPENABLE);
-        if (picIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(getContext(),
-                        "com.example.android.fileprovider",
-                        photoFile);
-                resultLauncher.launch(picIntent);
-            }
-        }
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,
-                ".jpg",
-                storageDir
-        );
-
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    private void setImage(String filename) throws IOException {
-        StorageReference imgReference = storageReference.child("images/"+filename);
-        imgReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri u) {
-                Glide.with(getContext()).load(u).into(profPicButton);
-                //profPicButton.setImageURI(Uri.parse(u.toString()));
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                exception.printStackTrace();
-            }
-        });
-    }
-
-    private String uploadFile(Uri uri) {
-        /*SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault());
-        Date now = new Date();*/
-        String fileName = sessionManager.getEmail();
-        final String[] newFileName = {null};
-        StorageReference imgReference = storageReference.child("images/" + fileName);
-        imgReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(getContext(),"Succesfully uploaded profilepicture", Toast.LENGTH_SHORT).show();
-                try {
-                    setImage(fileName);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if(pass1.equals(pass2)) {
+                    createAccount(email, usr, pass1);
+                } else {
+                    Toast.makeText(getContext(), "Passwords doesn't match", Toast.LENGTH_SHORT).show();
                 }
-                newFileName[0] = fileName;
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
             }
         });
-        return newFileName[0];
+
+
     }
+
+    private void createAccount(String email, String user, String password){
+        String url = "http://codrrip.herokuapp.com/register";
+
+        Map<String, String> params = new HashMap();
+        params.put("username", user);
+        params.put("password", password);
+        params.put("email", email);
+
+        JSONObject jsonParams = new JSONObject(params);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+
+        JsonObjectRequest postReq = new JsonObjectRequest(Request.Method.POST, url, jsonParams, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                sessionManager.setEmail(email);
+                sessionManager.setUsername(user);
+
+
+
+                // Create new fragment and transaction
+                Fragment newFragment = new LoginFragment();
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+                // Replace whatever is in the fragment_container view with this fragment,
+                // and add the transaction to the back stack
+                transaction.replace(R.id.loginFragmentContainer, newFragment);
+                transaction.addToBackStack(null);
+
+                // Commit the transaction
+                transaction.commit();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        requestQueue.add(postReq);
+
+
+    }
+
+
+
+
 
 
 

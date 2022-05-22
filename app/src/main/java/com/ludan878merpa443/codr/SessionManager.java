@@ -3,6 +3,11 @@ package com.ludan878merpa443.codr;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.json.JSONObject;
+
+import java.util.Collections;
+import java.util.Set;
+
 public class SessionManager {
     // Init vars
 
@@ -19,6 +24,7 @@ public class SessionManager {
 
     // Setter methods
 
+
     public void setLogin(boolean login) {
         editor.putBoolean("KEY_LOGIN", login);
         editor.commit();
@@ -34,8 +40,24 @@ public class SessionManager {
         editor.commit();
     }
 
+    public void setCurrent(String username){
+        editor.putString("CURRENT",username);
+        editor.commit();
+    }
+
     public void setChat(String username){
         editor.putString("CHAT_USER",username);
+        editor.commit();
+    }
+
+    public void setToken(String token){
+        editor.putString("TOKEN", token);
+        editor.commit();
+    }
+
+    // Set email method
+    public void setEmail(String email){
+        editor.putString("KEY_EMAIL", email);
         editor.commit();
     }
 
@@ -46,14 +68,18 @@ public class SessionManager {
     }
     public String getImage(){ return sharedPreferences.getString("P_PIC_NAME", "kisspng-lab-coats-computer-icons-clothing-labrador-5ac85aed605040.7029058515230799173945.png");}
 
-    // Set username method
-    public void setEmail(String email){
-        editor.putString("KEY_EMAIL", email);
-        editor.commit();
-    }
+
 
     // Get username method
     public String getEmail(){
         return sharedPreferences.getString("KEY_EMAIL","");
     }
+    public String getCurrent(){
+        return sharedPreferences.getString("CURRENT","");
+    }
+
+    public String getToken(){
+        return sharedPreferences.getString("TOKEN","");
+    }
+
 }

@@ -28,22 +28,22 @@
         android:text="@string/default_username"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.037" />
+        app:layout_constraintVertical_bias="0.018" />
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="110dp"
+        android:layout_height="136dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/ic_baseline_face_24"
+        android:clickable="true"
+        android:contentDescription="@string/profilepicture"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.098"
-        tools:src="@tools:sample/avatars" />
+        app:layout_constraintTop_toBottomOf="@+id/textview_username" />
 
     <View
         android:id="@+id/divider"
@@ -58,11 +58,15 @@
         app:layout_constraintVertical_bias="0.315" />
 
     <EditText
-        android:id="@+id/description"
-        android:layout_width="416dp"
-        android:layout_height="278dp"
+        android:id="@+id/tv_desc"
+        android:layout_width="412dp"
+        android:layout_height="284dp"
         android:ems="10"
-        android:inputType="textShortMessage|textLongMessage|textAutoCorrect|textPersonName"
+        android:gravity="top|left"
+        android:hint="@string/desc"
+        android:inputType="textCapSentences|textMultiLine"
+        android:singleLine="false"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -74,7 +78,6 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="148dp"
         android:fontFamily="monospace"
         android:text="Description"
         android:textSize="20sp"
@@ -83,7 +86,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView2"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/imageButton"
+        app:layout_constraintVertical_bias="0.61" />
+
+    <Button
+        android:id="@+id/button_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set description"
+        app:layout_constraintBottom_toTopOf="@+id/button_logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_desc"
+        app:layout_constraintVertical_bias="0.107" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
