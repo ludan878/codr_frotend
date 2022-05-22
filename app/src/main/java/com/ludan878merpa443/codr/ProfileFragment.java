@@ -292,7 +292,7 @@ public class ProfileFragment extends Fragment {
     private String uploadFile(Uri uri) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault());
         Date now = new Date();
-        String fileName = formatter.format(now);
+        String fileName = sessionManager.getEmail();
         sessionManager.setImage(fileName);
         final String[] newFileName = {null};
         StorageReference imgReference = storageReference.child("images/" + fileName);
@@ -300,7 +300,7 @@ public class ProfileFragment extends Fragment {
         imgReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(getContext(),"Succesfully uploaded profilepicture", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),"Succesfully uploaded profile picture", Toast.LENGTH_SHORT).show();
                 newFileName[0] = fileName;
 
             }

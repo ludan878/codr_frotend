@@ -156,9 +156,9 @@ public class SwipeFragment extends Fragment {
                 String uName = null;
                 String uDesc = null;
                 try {
-                    String pfp = response.getJSONObject(currentUserNum%response.length()).getString("pfp");
-                    uName = response.getJSONObject(currentUserNum%response.length()).getString("user_id");
-                    uDesc = response.getJSONObject(currentUserNum%response.length()).getString("desc");
+                    String pfp = response.getJSONObject(currentUserNum%response.length()-1).getString("pfp");
+                    uName = response.getJSONObject(currentUserNum%response.length()-1).getString("user_id");
+                    uDesc = response.getJSONObject(currentUserNum%response.length()-1).getString("desc");
                     setImage(pfp);
                 } catch (JSONException | IOException e) {
                     e.printStackTrace();
