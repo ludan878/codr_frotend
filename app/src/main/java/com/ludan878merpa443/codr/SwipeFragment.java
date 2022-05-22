@@ -137,6 +137,8 @@ public class SwipeFragment extends Fragment {
             }
         };
         requestQueue.add(postReq);
+
+        nextUser();
     }
 
     private void nextUser() {

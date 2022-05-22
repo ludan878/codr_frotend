@@ -258,7 +258,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setProfile(String filename, String desc) {
-        String url = "http://codrrip.herokuapp.com/user/setdescription";
+        String url = "http://codrrip.herokuapp.com/user/setprof";
 
         Map<String, String> params = new HashMap();
         params.put("pfp", filename);

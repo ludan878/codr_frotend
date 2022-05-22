@@ -55,10 +55,10 @@ public class LoginFragment extends Fragment {
         // Inflate the layout for this fragment
 
         sessionManager = new SessionManager(getContext());
-        /*if (sessionManager.getLogin()) {
+        if (sessionManager.getLogin()) {
             Intent mainIntent = new Intent(getActivity(), MainActivity.class);
             startActivity(mainIntent);
-        }*/
+        }
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
