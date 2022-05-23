@@ -22,10 +22,11 @@
 
     <TextView
         android:id="@+id/textview_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="328dp"
+        android:layout_height="34dp"
         android:fontFamily="monospace"
         android:text="@string/default_username"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -93,12 +94,24 @@
         android:id="@+id/button_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set description"
+        android:text="Update profile"
         app:layout_constraintBottom_toTopOf="@+id/button_logout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_desc"
         app:layout_constraintVertical_bias="0.107" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Press image to change profilepic"
+        app:layout_constraintBottom_toTopOf="@+id/imageButton"
+        app:layout_constraintEnd_toEndOf="@+id/textview_username"
+        app:layout_constraintStart_toStartOf="@+id/textview_username"
+        app:layout_constraintTop_toBottomOf="@+id/textview_username"
+        app:layout_constraintVertical_bias="0.769" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

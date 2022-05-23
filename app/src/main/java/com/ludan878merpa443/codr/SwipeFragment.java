@@ -43,7 +43,6 @@ public class SwipeFragment extends Fragment {
     private SessionManager sessionManager;
     private TextView userName;
     private TextView userDescription;
-    private TextView userAge;
     private ImageView userImage;
     private Button btnNo;
     private Button btnYes;
@@ -153,13 +152,15 @@ public class SwipeFragment extends Fragment {
         JsonArrayRequest getReq = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                String uName = null;
-                String uDesc = null;
+                String uName = "";
+                String uDesc = "     No users left to like!";
                 try {
-                    String pfp = response.getJSONObject(currentUserNum%response.length()-1).getString("pfp");
-                    uName = response.getJSONObject(currentUserNum%response.length()-1).getString("user_id");
-                    uDesc = response.getJSONObject(currentUserNum%response.length()-1).getString("desc");
-                    setImage(pfp);
+                    if(response.length()>0){
+                        String pfp = response.getJSONObject(currentUserNum%(response.length())).getString("pfp");
+                        uName = response.getJSONObject(currentUserNum%(response.length())).getString("user_id");
+                        uDesc = response.getJSONObject(currentUserNum%(response.length())).getString("desc");
+                        setImage(pfp);
+                    }
                 } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
@@ -188,7 +189,9 @@ public class SwipeFragment extends Fragment {
         imgReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri u) {
-                Glide.with(getContext()).load(u).into(userImage);
+                if(getActivity() != null) {
+                    Glide.with(getContext()).load(u).into(userImage);
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

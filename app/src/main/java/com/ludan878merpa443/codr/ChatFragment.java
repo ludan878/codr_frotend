@@ -114,24 +114,32 @@ public class ChatFragment extends Fragment {
     }
 
     private void removeChat(){
-        String url = "http://codrrip.herokuapp.com/chat/delete";
-        JSONObject params = new JSONObject();
-        try {
-            params.put("target", sessionManager.getFriend());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url, new Response.Listener<StringRequest>() {
-            @Override
-            public void onResponse(StringRequest response) {
+        String url = "http://codrrip.herokuapp.com/chat/delete/"+sessionManager.getFriend();
+        Map<String, String> params = new HashMap();
 
+        JSONObject jsonParams = new JSONObject(params);
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+
+        JsonArrayRequest postReq = new JsonArrayRequest(Request.Method.DELETE, url, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                Log.d(TAG, "onResponse: Success");
+                getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new SwipeFragment());
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Log.d(TAG, error.toString());
             }
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap();
+                headers.put("Authorization", "Bearer "+sessionManager.getToken());
+                return headers;
+            }
+        };
+        requestQueue.add(postReq);
     }
 
     private void setUserprofile(){

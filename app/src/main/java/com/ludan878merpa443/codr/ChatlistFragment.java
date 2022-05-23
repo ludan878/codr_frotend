@@ -46,6 +46,7 @@ public class ChatlistFragment extends Fragment {
     private RequestQueue QUEUE;
     private ChatList chatListAdapter;
     private ArrayList<JSONObject> arrayList;
+    private ArrayList<String> chatUsernameList;
 
 
 
@@ -73,11 +74,12 @@ public class ChatlistFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         sessionManager = new SessionManager(getContext());
+        chatUsernameList = new ArrayList<>();
         arrayList = new ArrayList<>();
+        fetchChats();
         chatlist = view.findViewById(R.id.chatlist);
         chatListAdapter = new ChatList(getActivity(), people);
         chatlist.setAdapter(chatListAdapter);
-        fetchChats();
         chatlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

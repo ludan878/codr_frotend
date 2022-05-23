@@ -54,15 +54,15 @@
 
     <TextView
         android:id="@+id/chatUsername"
-        android:layout_width="90dp"
-        android:layout_height="27dp"
+        android:layout_width="216dp"
+        android:layout_height="30dp"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/divider"
         app:layout_constraintEnd_toStartOf="@+id/chatPfp"
-        app:layout_constraintHorizontal_bias="0.329"
+        app:layout_constraintHorizontal_bias="0.71"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.847" />
+        app:layout_constraintVertical_bias="0.872" />
 
     <ImageView
         android:id="@+id/chatPfp"

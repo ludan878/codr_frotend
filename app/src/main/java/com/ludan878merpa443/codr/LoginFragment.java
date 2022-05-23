@@ -2,11 +2,14 @@ package com.ludan878merpa443.codr;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -58,11 +61,44 @@ public class LoginFragment extends Fragment {
         // Inflate the layout for this fragment
 
         sessionManager = new SessionManager(getContext());
-        if (sessionManager.getLogin()) {
+        if (sessionManager.getLogin() && getPerms()) {
             Intent mainIntent = new Intent(getActivity(), MainActivity.class);
             startActivity(mainIntent);
         }
         return inflater.inflate(R.layout.fragment_login, container, false);
+    }
+
+    private boolean getPerms() {
+        final int REQUEST_CODE_PERMISSION = 2;
+        String[] mPermission = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.INTERNET,
+                Manifest.permission.CAMERA};
+        try {
+            if (ActivityCompat.checkSelfPermission(getContext(), mPermission[0])
+                    != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(getContext(), mPermission[1])
+                            != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(getContext(), mPermission[2])
+                            != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(getContext(), mPermission[3])
+                            != PackageManager.PERMISSION_GRANTED) {
+
+                Log.e("TAGTAG", "DENIED");
+                ActivityCompat.requestPermissions(getActivity(),
+                        mPermission, REQUEST_CODE_PERMISSION);
+                return false;
+
+                // If any permission aboe not allowed by user, this condition will execute every tim, else your else part will work
+            }
+            else
+            {
+                Log.e("TAGTAG", "GRANTED");
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -80,7 +116,6 @@ public class LoginFragment extends Fragment {
                 //Get text from EditText
                 String email = edittext_email.getText().toString().trim();
                 String password = edittext_password.getText().toString().trim();
-
                 login_user(email, password);
 
             }
@@ -106,39 +141,41 @@ public class LoginFragment extends Fragment {
     }
 
     private void login_user(String email, String password) {
-        String url = "http://codrrip.herokuapp.com/login";
+        if(getPerms()) {
+            String url = "http://codrrip.herokuapp.com/login";
 
-        Map<String, String> params = new HashMap();
-        params.put("password", password);
-        params.put("email", email);
+            Map<String, String> params = new HashMap();
+            params.put("password", password);
+            params.put("email", email);
 
-        JSONObject jsonParams = new JSONObject(params);
+            JSONObject jsonParams = new JSONObject(params);
 
-        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+            RequestQueue requestQueue = Volley.newRequestQueue(getContext());
 
-        JsonObjectRequest postReq = new JsonObjectRequest(Request.Method.POST, url, jsonParams, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                sessionManager.setEmail(email);
-                try {
-                    sessionManager.setToken(response.getString("access-token"));
-                    Log.d(TAG, "onResponse: "+sessionManager.getToken());
-                    sessionManager.setLogin(true);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    // TODO: handle fail
+            JsonObjectRequest postReq = new JsonObjectRequest(Request.Method.POST, url, jsonParams, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    sessionManager.setEmail(email);
+                    try {
+                        sessionManager.setToken(response.getString("access-token"));
+                        Log.d(TAG, "onResponse: " + sessionManager.getToken());
+                        sessionManager.setLogin(true);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        // TODO: handle fail
+                    }
+                    Intent mainIntent = new Intent(getActivity(), MainActivity.class);
+                    startActivity(mainIntent);
+                    getUsername();
                 }
-                getUsername();
-                Intent mainIntent = new Intent(getActivity(), MainActivity.class);
-                startActivity(mainIntent);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, error.toString());
-            }
-        });
-        requestQueue.add(postReq);
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG, error.toString());
+                }
+            });
+            requestQueue.add(postReq);
+        }
     }
 
     private void getUsername() {
