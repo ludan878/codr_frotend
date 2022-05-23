@@ -30,22 +30,31 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inflater.inflate(R.layout.codrlogo, null);
         actionBar.setCustomView(v);
-
+        findViewById(R.id.ChatlistFragment).setClickable(false);
 
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()){
                 case R.id.ChatlistFragment:
+                    findViewById(R.id.ChatlistFragment).setClickable(false);
+                    findViewById(R.id.SwipeFragment).setClickable(true);
+                    findViewById(R.id.ProfileFragment).setClickable(true);
                     replaceFragment(new ChatlistFragment());
                     break;
                 case R.id.SwipeFragment:
+                    findViewById(R.id.ChatlistFragment).setClickable(true);
+                    findViewById(R.id.SwipeFragment).setClickable(false);
+                    findViewById(R.id.ProfileFragment).setClickable(true);
                     replaceFragment(new SwipeFragment());
                     break;
                 case R.id.ProfileFragment:t:
+                findViewById(R.id.ChatlistFragment).setClickable(true);
+                    findViewById(R.id.SwipeFragment).setClickable(true);
+                    findViewById(R.id.ProfileFragment).setClickable(false);
                     replaceFragment(new ProfileFragment());
                     break;
-            }
+            };
             return true;
         });
 

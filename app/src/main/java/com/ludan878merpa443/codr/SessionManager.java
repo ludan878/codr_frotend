@@ -50,6 +50,11 @@ public class SessionManager {
         editor.commit();
     }
 
+    public void setFriend(String friend){
+        editor.putString("FRIEND",friend);
+        editor.commit();
+    }
+
     public void setToken(String token){
         editor.putString("TOKEN", token);
         editor.commit();
@@ -58,6 +63,11 @@ public class SessionManager {
     // Set email method
     public void setEmail(String email){
         editor.putString("KEY_EMAIL", email);
+        editor.commit();
+    }
+
+    public void reset(){
+        editor.clear();
         editor.commit();
     }
 
@@ -77,9 +87,14 @@ public class SessionManager {
     public String getCurrent(){
         return sharedPreferences.getString("CURRENT","");
     }
-
     public String getToken(){
         return sharedPreferences.getString("TOKEN","");
     }
-
+    public String getChat() {
+        return sharedPreferences.getString("CHAT_USER","");
+    }
+    public String getUsername() {
+        return sharedPreferences.getString("USERNAME", "");
+    }
+    public String getFriend() {return sharedPreferences.getString("FRIEND","");}
 }

@@ -72,7 +72,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/divider"
-        app:layout_constraintVertical_bias="0.096" />
+        app:layout_constraintVertical_bias="0.027" />
 
     <TextView
         android:id="@+id/textView"

@@ -18,13 +18,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -125,12 +128,9 @@ public class LoginFragment extends Fragment {
                     e.printStackTrace();
                     // TODO: handle fail
                 }
-
+                getUsername();
                 Intent mainIntent = new Intent(getActivity(), MainActivity.class);
                 startActivity(mainIntent);
-
-
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -139,5 +139,33 @@ public class LoginFragment extends Fragment {
             }
         });
         requestQueue.add(postReq);
+    }
+
+    private void getUsername() {
+        String url = "http://codrrip.herokuapp.com/profile";
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    sessionManager.setUsername(response.getString("user_id"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap();
+                headers.put("Authorization", "Bearer "+sessionManager.getToken());
+                return headers;
+            }
+        };
+        queue.add(jsonObjectRequest);
     }
 }

@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -53,7 +54,6 @@ public class ChatList extends ArrayAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         String username = people.get(position).first;
-        String imageid = people.get(position).second;
         View row = convertView;
         LayoutInflater inflater = context.getLayoutInflater();
         if(convertView==null) {
@@ -61,30 +61,13 @@ public class ChatList extends ArrayAdapter {
         }
         storageReference = FirebaseStorage.getInstance().getReference();
         textViewName = (TextView) row.findViewById(R.id.textViewName);
-        imageFlag = (ImageView) row.findViewById(R.id.imageViewFlag);
-
         textViewName.setText(username);
-        try {
-            setImage(imageid);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return row;
     }
 
-    private void setImage(String filename) throws IOException {
-        StorageReference imgReference = storageReference.child("images/"+filename);
-        imgReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri u) {
-                Glide.with(getContext()).load(u).into(imageFlag);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                exception.printStackTrace();
-            }
-        });
+    @Nullable
+    @Override
+    public Object getItem(int position) {
+        return super.getItem(position);
     }
-
 }

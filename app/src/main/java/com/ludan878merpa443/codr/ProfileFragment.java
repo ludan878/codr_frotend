@@ -141,6 +141,7 @@ public class ProfileFragment extends Fragment {
                         // Set username empty
                         sessionManager.setEmail("");
                         // Redirect to login activity
+                        sessionManager.reset();
                         startActivity(new Intent(getContext(), LoginActivity.class));
                         getActivity().finish();
                     }
@@ -195,7 +196,9 @@ public class ProfileFragment extends Fragment {
         imgReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri u) {
-                Glide.with(getContext()).load(u).into(imageButton);
+                if(getActivity() != null){
+                    Glide.with(getContext()).load(u).into(imageButton);
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
