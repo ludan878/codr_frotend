@@ -76,9 +76,9 @@ public class ChatlistFragment extends Fragment {
         sessionManager = new SessionManager(getContext());
         chatUsernameList = new ArrayList<>();
         arrayList = new ArrayList<>();
-        fetchChats();
         chatlist = view.findViewById(R.id.chatlist);
         chatListAdapter = new ChatList(getActivity(), people);
+        fetchChats();
         chatlist.setAdapter(chatListAdapter);
         chatlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
