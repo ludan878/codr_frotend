@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                     findViewById(R.id.ProfileFragment).setClickable(true);
                     replaceFragment(new SwipeFragment());
                     break;
-                case R.id.ProfileFragment:t:
+                case R.id.ProfileFragment:
                 findViewById(R.id.ChatlistFragment).setClickable(true);
                     findViewById(R.id.SwipeFragment).setClickable(true);
                     findViewById(R.id.ProfileFragment).setClickable(false);
