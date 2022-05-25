@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -40,12 +41,14 @@ import java.util.Map;
 import kotlin.Triple;
 
 public class ChatlistFragment extends Fragment {
+    /**
+     * Declares necessary vars.
+     */
     private SessionManager sessionManager;
     private ListView chatlist;
-    private ArrayList<Pair<String, String>> people = new ArrayList<>();
     private RequestQueue QUEUE;
-    private ChatList chatListAdapter;
-    private ArrayList<JSONObject> arrayList;
+    private ArrayAdapter<String> chatListAdapter;
+    private JSONObject chatsJson;
     private ArrayList<String> chatUsernameList;
 
 
@@ -70,37 +73,63 @@ public class ChatlistFragment extends Fragment {
         return view;
     }
 
+    /**
+     * When view is created, all vars are initialized and listeners made for the buttons.
+     * The chatlist is created with a normal simple_list_item_1 list layout from the chatUsernameList.
+     * Through fetchChats, it is then updated with the chats of the users profile.
+     * @param view
+     * @param savedInstanceState
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         sessionManager = new SessionManager(getContext());
         chatUsernameList = new ArrayList<>();
-        arrayList = new ArrayList<>();
+        chatsJson = new JSONObject();
         chatlist = view.findViewById(R.id.chatlist);
-        chatListAdapter = new ChatList(getActivity(), people);
+        chatListAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, chatUsernameList);
         fetchChats();
         chatlist.setAdapter(chatListAdapter);
         chatlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /**
+             * When a chat is clicked, its position will be used to get the items username
+             * It then initializes and sends the user to a chat with whom the user clicked on.
+             * @param adapterView
+             * @param view
+             * @param i
+             * @param l
+             */
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                setChat(arrayList.toArray().length-i-1);
+                try {
+                    Toast.makeText(getContext(), chatListAdapter.getItem(i) + chatsJson.getString(chatListAdapter.getItem(i)), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                setChat(chatListAdapter.getItem(i)); // User_id from itemlist
                 getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new ChatFragment()).commit();
             }
         });
     }
 
-    private void setChat(int i) {
+    /**
+     * Sets the chat in the sessionManager, used in the manner as of a LiveViewModel.
+     * @param user_id
+     */
+    private void setChat(String user_id) {
         try {
-            sessionManager.setChat(arrayList.get(arrayList.toArray().length-i-1).getString("chat_id"));
-            sessionManager.setFriend(arrayList.get(arrayList.toArray().length-i-1).getString("user_id"));
+            sessionManager.setChat(chatsJson.getString(user_id));
+            sessionManager.setFriend(user_id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Gathers the chats from the database of the user, then adds them, one by one to the adapter.
+     * Might be some unecessary requests made, could optimize the code.
+     */
     private void fetchChats() {
-        chatListAdapter.clear();
-        arrayList.clear();
         QUEUE = Volley.newRequestQueue(getContext());
         String url = "http://codrrip.herokuapp.com/user/chats";
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, url, null, new Response.Listener<JSONArray>() {
@@ -110,8 +139,8 @@ public class ChatlistFragment extends Fragment {
                     try {
                         String p = "";
                         JSONObject chat = response.getJSONObject(i);
-                        arrayList.add(chat);
                         p = chat.getString("user_id");
+                        chatsJson.put(p, chat.getString("chat_id"));
                         RequestQueue queue = Volley.newRequestQueue(getContext());
                         String url2 = "http://codrrip.herokuapp.com/user/"+p;
                         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url2, null, new Response.Listener<JSONObject>() {
@@ -120,7 +149,7 @@ public class ChatlistFragment extends Fragment {
                                 try {
                                     String user_id = response.getString("user_id");
                                     String pfp = response.getString("pfp");
-                                    chatListAdapter.add(new Pair<>(user_id, pfp));
+                                    chatListAdapter.add(user_id);
                                     Log.d("Mervan", "onResponse: "+pfp+user_id);
                                 } catch (JSONException e) {
                                     e.printStackTrace();

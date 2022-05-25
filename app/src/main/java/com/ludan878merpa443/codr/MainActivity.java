@@ -16,9 +16,15 @@ import android.view.Window;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        /**
+         * When created, the actionbar is replaced with the icon of "Codr" and it's own background.
+         * Then a bottom menu is created
+         * Through the case's below, each of the buttons will do a fragmenttransaction, replacing
+         * The current fragment in the "Fragmentcontainerview".
+         * @see #replaceFragment(Fragment)
+         */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -61,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void replaceFragment(Fragment fragment) {
+        /**
+         * Will replace the current fragment in the fragmentcontainerview with the assigned fragment
+         * @param fragment is the fragment assigned.
+         */
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentContainerView, fragment);

@@ -50,10 +50,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class ProfileFragment extends Fragment {
+
+    /**
+     * Declaring all necessary variables.
+     */
 
     private SessionManager sessionManager;
     private Button button_logout;
@@ -82,6 +85,9 @@ public class ProfileFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
+    /**
+     * When view is created, all variables is initialized.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -90,12 +96,19 @@ public class ProfileFragment extends Fragment {
         button_logout = getActivity().findViewById(R.id.button_logout);
         imageButton = getActivity().findViewById(R.id.imageButton);
         description = getActivity().findViewById(R.id.tv_desc);
-        storageReference = FirebaseStorage.getInstance().getReference();
+        storageReference = FirebaseStorage.getInstance().getReference(); // Connection to the firebase database for image use (In this application.)
         textview_username = getActivity().findViewById(R.id.textview_username);
         String sEmail = sessionManager.getEmail();
         textview_username.setText(sEmail);
         fetchDescription();
         resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            /**
+             * Handles the result from the intent.
+             * First sets the profilepicture uri (profUri)
+             * then sets the image of the button to the desired image.
+             * @param result
+             * The data is contained in the results var.
+             */
             @Override
             public void onActivityResult(ActivityResult result) {
                 Intent data = result.getData();
@@ -108,12 +121,22 @@ public class ProfileFragment extends Fragment {
         });
 
         imageButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When the button is pressed, an intent to choose the image is started through
+             * dispatchTakePictureIntent.
+             */
             @Override
             public void onClick(View view) {
                 dispatchTakePictureIntent();
             }
         });
         setDesc.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When setDesc is pressed, the image from the sessionManagers profuri is uploaed
+             * to the FireBase database, and the descriptiontext is uploaded to the heroku
+             * database.
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 try {
@@ -124,6 +147,13 @@ public class ProfileFragment extends Fragment {
             }
         });
         button_logout.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When the logout button is pressed, a question to wether the user wants to log out
+             * appears through the AlertDialog builder seen bellow. If yes, the person is logged out
+             * redirected to the login page, aswell as setting the sessionManagers login setting to
+             * false, which will prevent the user from automatically loging in next session.
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 // Init alert dialog builder
@@ -160,11 +190,13 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Fetches the description of the user and sets it to the EditText view. (Done through ways
+     * explained before.)
+     */
     private void fetchDescription() {
         String url = "http://codrrip.herokuapp.com/profile";
-
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-
         JsonObjectRequest postReq = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -190,7 +222,11 @@ public class ProfileFragment extends Fragment {
         };
         requestQueue.add(postReq);
     }
-
+    /**
+     * Fetches the image from the users profile on the database and sets it to
+     * image button with glide (Glide downloads the profilepic temporarily and
+     * sets the uri of the imagebutton to that uri.)
+     */
     private void setImage(String filename) throws IOException {
         StorageReference imgReference = storageReference.child("images/"+filename);
         imgReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -208,6 +244,9 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Makes and queues an intent to pic an image from the gallery app of the user.
+     */
     private void dispatchTakePictureIntent() {
         Intent picIntent = new Intent();
         picIntent.setType("image/*");
@@ -224,7 +263,7 @@ public class ProfileFragment extends Fragment {
                 Uri photoURI = FileProvider.getUriForFile(getContext(),
                         "com.example.android.fileprovider",
                         photoFile);
-                resultLauncher.launch(picIntent);
+                resultLauncher.launch(picIntent); // Some code here might be unnecessary but is included if we wanted to change from this to taking a picture with the camera.
             }
         }
     }
@@ -244,6 +283,12 @@ public class ProfileFragment extends Fragment {
         return image;
     }
 
+    /**
+     * Updates the profile with the desired profilepic and description.
+     * @param filename
+     * @param desc
+     * @throws IOException
+     */
     private void updateProfile(String filename, String desc) throws IOException {
         StorageReference imgReference = storageReference.child("images/"+filename);
         imgReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -260,9 +305,14 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Uploads the filename and description to the heroku database through a JsonObjectRequest seen
+     * bellow.
+     * @param filename
+     * @param desc
+     */
     private void setProfile(String filename, String desc) {
         String url = "http://codrrip.herokuapp.com/user/setprof";
-
         Map<String, String> params = new HashMap();
         params.put("pfp", filename);
         params.put("desc", desc);
@@ -275,6 +325,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onResponse(JSONObject response) {
                 sessionManager.setImage(filename);
+                Toast.makeText(getContext(), "Successfully set profile description and image.", Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -292,20 +343,20 @@ public class ProfileFragment extends Fragment {
         requestQueue.add(postReq);
     }
 
-    private String uploadFile(Uri uri) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault());
-        Date now = new Date();
+    /**
+     * Uploads the image from the uri to the FireBase database
+     * @param uri
+     * Makes a toast telling the user if successfully or not.
+     */
+    private void uploadFile(Uri uri) {
         String fileName = sessionManager.getEmail();
         sessionManager.setImage(fileName);
-        final String[] newFileName = {null};
         StorageReference imgReference = storageReference.child("images/" + fileName);
         imgReference.delete();
         imgReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(getContext(),"Succesfully uploaded profile picture", Toast.LENGTH_SHORT).show();
-                newFileName[0] = fileName;
-
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -314,7 +365,6 @@ public class ProfileFragment extends Fragment {
                 Toast.makeText(getContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
             }
         });
-        return newFileName[0];
     }
 
 }

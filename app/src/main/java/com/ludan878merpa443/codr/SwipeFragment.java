@@ -40,6 +40,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SwipeFragment extends Fragment {
+    /**
+     * Declares necessary vars.
+     */
     private SessionManager sessionManager;
     private TextView userName;
     private TextView userDescription;
@@ -47,8 +50,6 @@ public class SwipeFragment extends Fragment {
     private Button btnNo;
     private Button btnYes;
     private StorageReference storageReference;
-    private boolean choice;
-    private ArrayList<JSONObject> users;
     int currentUserNum;
 
 
@@ -76,25 +77,36 @@ public class SwipeFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_swipe, container, false);
     }
 
+    /**
+     * Initializes all vars and assigns listeners to the buttons.
+     * @param v
+     * @param savedInstanceState
+     */
     @Override
     public void onViewCreated(View v, Bundle savedInstanceState) {
         storageReference = FirebaseStorage.getInstance().getReference();
         sessionManager = new SessionManager(getContext());
-        users = new ArrayList<>();
         btnNo = getActivity().findViewById(R.id.btnNo);
         btnYes = getActivity().findViewById(R.id.btnYes);
         userName = getActivity().findViewById(R.id.tv_username);
         userDescription = getActivity().findViewById(R.id.tv_d);
         userImage = getActivity().findViewById(R.id.ivPfp);
-        choice = false;
         getUserList();
         btnNo.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When clicked it will go the next user in the feed.
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 nextUser();
             }
         });
         btnYes.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When clicked it will like the user with the likeUser() method.
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 try {
@@ -106,7 +118,12 @@ public class SwipeFragment extends Fragment {
         });
     }
 
-
+    /**
+     * Does a JsonObjectRequest to the heroku server to like the selected user.
+     * Also triggers the nextUser method.
+     * @param user_id
+     * @throws JSONException
+     */
     private void likeUser(String user_id) throws JSONException {
         String url = "http://codrrip.herokuapp.com/user/like";
 
@@ -140,12 +157,18 @@ public class SwipeFragment extends Fragment {
         nextUser();
     }
 
+    /**
+     * Goes to the next user and updates the feed.
+     */
     private void nextUser() {
         currentUserNum ++;
         getUserList();
     }
 
-
+    /**
+     * Makes a JsonArrayRequest to the server, fetching all users that the user hasnt liked.
+     * Sets the current user to the screen in the list. Fetching the users description and profilepic.
+     */
     private void getUserList(){
         String url = "http://codrrip.herokuapp.com/users";
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());

@@ -28,7 +28,12 @@ public class MessageList extends ArrayAdapter {
     }
 
 
-
+    /**
+     * Makes a custom ListView with custom rows showing both the user and the message.
+     * @param position
+     * @param convertView
+     * @param parent
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         String username = people.get(position).second;

@@ -9,6 +9,11 @@ import java.util.Collections;
 import java.util.Set;
 
 public class SessionManager {
+    /**
+     * All methods are quite self explanatory .
+     */
+
+
     // Init vars
 
     SharedPreferences sharedPreferences;

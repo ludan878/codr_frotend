@@ -43,7 +43,6 @@ public class LoginFragment extends Fragment {
     Button button_register;
     EditText edittext_email;
     EditText edittext_password;
-
     SessionManager sessionManager;
 
     public LoginFragment() {
@@ -59,7 +58,13 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
+        /**
+         * When view is being created, the
+         * @see sessionManager is initialized.
+         * It then checks if the person has had a previous login session withot logging out.
+         * If it has, it will automatically log the person in without the need of
+         * him/her logging in once again.
+         */
         sessionManager = new SessionManager(getContext());
         if (sessionManager.getLogin() && getPerms()) {
             Intent mainIntent = new Intent(getActivity(), MainActivity.class);
@@ -67,7 +72,11 @@ public class LoginFragment extends Fragment {
         }
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
-
+    /**
+     * Checks if the necessary perms has been permitted.
+     * If not, it will request them and ask then return false.
+     * If it has been permitted, the method will return true.
+     */
     private boolean getPerms() {
         final int REQUEST_CODE_PERMISSION = 2;
         String[] mPermission = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -101,6 +110,10 @@ public class LoginFragment extends Fragment {
         return false;
     }
 
+    /**
+     * When view has been created, each of the objects in the view is being set to each var.
+     * A listener for each button.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -111,6 +124,11 @@ public class LoginFragment extends Fragment {
         edittext_password = getActivity().findViewById(R.id.edittext_password);
 
         button_login.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When the button is clicked it gathers the login info and requests a login from the
+             * server. See login_user(email, password).
+             *
+             */
             @Override
             public void onClick(View view) {
                 //Get text from EditText
@@ -121,6 +139,10 @@ public class LoginFragment extends Fragment {
             }
         });
         button_register.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When register button is clicked, the user is directed to the register fragment
+             * through a fragment transaction.
+             */
             @Override
             public void onClick(View view) {
                 // Create new fragment and transaction
@@ -140,6 +162,14 @@ public class LoginFragment extends Fragment {
 
     }
 
+    /**
+     * @param email
+     * @param password
+     * With the email and password, a JsonObjectRequest with the assinged parameters through a
+     * @see JSONObject, a request is sent to the heroku app requesting the login.
+     * If accepted it will set the email in the sessionManager and login to true. (Which is used in the MainActivity
+     * to keep a prolonged login-session). The access token is also recieved used for future server-requests.
+     */
     private void login_user(String email, String password) {
         if(getPerms()) {
             String url = "http://codrrip.herokuapp.com/login";
@@ -178,6 +208,11 @@ public class LoginFragment extends Fragment {
         }
     }
 
+    /**
+     * Used to make a request much similar to the last one, gathering the username of the user, setting it to the sessionManager
+     * for future use.
+     * By overriding the "getHeaders()" method, one could add custom headers to the request. f.e. the access key.
+     */
     private void getUsername() {
         String url = "http://codrrip.herokuapp.com/profile";
         RequestQueue queue = Volley.newRequestQueue(getContext());

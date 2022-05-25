@@ -33,19 +33,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.018" />
 
-    <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_width="110dp"
-        android:layout_height="136dp"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/ic_baseline_face_24"
-        android:clickable="true"
-        android:contentDescription="@string/profilepicture"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview_username" />
-
     <View
         android:id="@+id/divider"
         android:layout_width="409dp"
@@ -113,5 +100,18 @@
         app:layout_constraintStart_toStartOf="@+id/textview_username"
         app:layout_constraintTop_toBottomOf="@+id/textview_username"
         app:layout_constraintVertical_bias="0.769" />
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="110dp"
+        android:layout_height="136dp"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/ic_baseline_face_24"
+        android:clickable="true"
+        android:contentDescription="@string/profilepicture"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview_username" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

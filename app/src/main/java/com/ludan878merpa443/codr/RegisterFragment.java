@@ -66,18 +66,16 @@ import java.util.Locale;
 import java.util.Map;
 
 public class RegisterFragment extends Fragment {
-    private final int REQUEST_CODE = 1101;
-    private ImageButton profPicButton;
+    /**
+     * Declares necessary vars.
+     */
     private EditText edt_name;
     private EditText edt_email;
     private EditText edt_password;
     private EditText edt_rpt_password;
-    private String currentPhotoPath;
-    private StorageReference storageReference;
     private SessionManager sessionManager;
-    private Uri profUri;
     private Button btnReg;
-    ActivityResultLauncher<Intent> resultLauncher; // Creates a List of Intents
+
     public RegisterFragment() {
         // Required empty public constructor
     }
@@ -94,6 +92,10 @@ public class RegisterFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_register, container, false);
     }
 
+    /**
+     * When view is created, all vars are initialized.
+     * and Listeners for the button is made.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -104,6 +106,12 @@ public class RegisterFragment extends Fragment {
         edt_password = getActivity().findViewById(R.id.editTextTextPassword);
         edt_rpt_password = getActivity().findViewById(R.id.edtRepeatPassword);
         btnReg.setOnClickListener(new View.OnClickListener() {
+            /**
+             * When button is pressed, the info from the EditText views are gathered and sent to the
+             * createAccount method seen bellow.
+             * Also checks if the passwords match alerting the user if not.
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 String usr = edt_name.getText().toString();
@@ -122,9 +130,15 @@ public class RegisterFragment extends Fragment {
 
     }
 
+    /**
+     * Sends a request to make an account to the heroku server with a JsonObjectRequest.
+     * If successful it will redirect the user to the login page.
+     * @param email
+     * @param user
+     * @param password
+     */
     private void createAccount(String email, String user, String password){
         String url = "http://codrrip.herokuapp.com/register";
-
         Map<String, String> params = new HashMap();
         params.put("username", user);
         params.put("password", password);

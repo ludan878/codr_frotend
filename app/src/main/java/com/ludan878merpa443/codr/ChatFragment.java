@@ -48,7 +48,9 @@ import java.util.Map;
 
 
 public class ChatFragment extends Fragment {
-
+    /**
+     * Declares all necessary vars.
+     */
     private ArrayList<Pair<String, String>> messages;
     private SessionManager sessionManager;
     private StorageReference storageReference;
@@ -73,6 +75,12 @@ public class ChatFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_chat, container, false);
     }
 
+    /**
+     * Firstly initializes all vars and creates listeners for each button.
+     * Also fetches the messages from the server and sets the friends userprofile (image etc.).
+     * @param view
+     * @param savedInstanceState
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -86,23 +94,35 @@ public class ChatFragment extends Fragment {
         btnUnfriend = getActivity().findViewById(R.id.buttonUnfriendbuttonUnfriend);
         ivUserpfp = getActivity().findViewById(R.id.chatPfp);
         messages = new ArrayList<>();
-        messageListAdapter = new MessageList(getActivity(), messages);
+        messageListAdapter = new MessageList(getActivity(), messages); // Custom listview made to show the messenger and the message.
         messagesView.setAdapter(messageListAdapter);
         fetchMessages();
         setUserprofile();
         btnUnfriend.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Removes the like and chat from both users.
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 removeChat();
             }
         });
         btnRefresh.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Refetches the messages from the chat.
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 fetchMessages();
             }
         });
         sendMessage.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Sends the message to the database and reupdates the chat.
+             * @param view
+             */
             @Override
             public void onClick(View view) {
                 sendIt();
@@ -113,6 +133,9 @@ public class ChatFragment extends Fragment {
 
     }
 
+    /**
+     * Sends a request to remove the desired chat and likes from the database.
+     */
     private void removeChat(){
         String url = "http://codrrip.herokuapp.com/chat/delete/"+sessionManager.getFriend();
         Map<String, String> params = new HashMap();
@@ -142,6 +165,10 @@ public class ChatFragment extends Fragment {
         requestQueue.add(postReq);
     }
 
+    /**
+     * Sends a request to fetch the friends information from the database and sets the Username
+     * in the chat aswell as the friends image.
+     */
     private void setUserprofile(){
         String friend = sessionManager.getFriend();
         chatUsername.setText(friend);
@@ -174,6 +201,11 @@ public class ChatFragment extends Fragment {
         queue.add(jsonObjectRequest);
     }
 
+    /**
+     * Sets the image to the imageView, a copy of the method in the ProfileFragment.
+     * @param filename
+     * @throws IOException
+     */
     private void setImage(String filename) throws IOException {
         StorageReference imgReference = storageReference.child("images/"+filename);
         imgReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -189,6 +221,11 @@ public class ChatFragment extends Fragment {
         });
     }
 
+    /**
+     * Sends the message from the user to the database with a JsonObjectRequest.
+     * the JSONObject is never used but I don't dare to remove it before it is reviewd as it may
+     * cause spooky mayhem.
+     */
     private void sendIt() {
         String message = messageText.getText().toString();
         String url = "http://codrrip.herokuapp.com/chat/"+sessionManager.getChat()+"/message";
@@ -226,6 +263,10 @@ public class ChatFragment extends Fragment {
         fetchMessages();
     }
 
+    /**
+     * Fetches the messages from the server with a JsonArrayRequests which gets an array instead of
+     * an JsonObject, this is then iterated through, adding the messages to the listview.
+     */
     private void fetchMessages() {
         messageListAdapter.clear();
         String url = "http://codrrip.herokuapp.com/chat/"+sessionManager.getChat();

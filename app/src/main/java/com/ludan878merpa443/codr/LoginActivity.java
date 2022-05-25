@@ -15,5 +15,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_acitivty);
+        /**
+         * Activity when app is started, everything happens through the
+         * @see LoginFragment
+         */
     }
 }
