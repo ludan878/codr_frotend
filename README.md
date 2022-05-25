@@ -5,7 +5,7 @@ Codr är en app liknande till Tinder men istället för sökandet efter en partn
 
 ## Uppbyggnad av systemet
 För att bygga appen/systemet finns två alternativ
-> 1. Installera APK genom att först tillåta installationer av appar från okända källor i utvecklarinställningarna på din mobil och att sedan installera appen som normalt.
+> 1. Installera APK genom att först tillåta installationer av appar från okända källor i utvecklarinställningarna på din mobil och att sedan installera appen som normalt. Du kan hämta apk:n från denna länk: https://liuonline-my.sharepoint.com/:u:/g/personal/ludan878_student_liu_se/EQfv8x_bgNpOkmV-5qCKuzABK-VG_fNyWPeCK1X-FQA2Gg?e=5rjvwF 
 > 2. Köra appen genom att först ladda ner repot, sedan genom Android Studio och genom att koppla in din mobil på datorn kan du bygga appen genom att trycka på den gröna startknappen längst upp i Android Studio. 
 
 ## Poängsammling
