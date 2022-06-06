@@ -47,6 +47,8 @@ public class SwipeFragment extends Fragment {
     private TextView userName;
     private TextView userDescription;
     private ImageView userImage;
+    private TextView favCount;
+    private Button favButton;
     private Button btnNo;
     private Button btnYes;
     private StorageReference storageReference;
@@ -88,10 +90,27 @@ public class SwipeFragment extends Fragment {
         sessionManager = new SessionManager(getContext());
         btnNo = getActivity().findViewById(R.id.btnNo);
         btnYes = getActivity().findViewById(R.id.btnYes);
+        favButton = getActivity().findViewById(R.id.buttonFav);
         userName = getActivity().findViewById(R.id.tv_username);
+        favCount = getActivity().findViewById(R.id.tvFavCount);
         userDescription = getActivity().findViewById(R.id.tv_d);
         userImage = getActivity().findViewById(R.id.ivPfp);
         getUserList();
+        favButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Favorites the user when clicked, works as a like button
+             * @param view
+             */
+            @Override
+            public void onClick(View view) {
+                try {
+                    favUser(sessionManager.getCurrent());
+                    likeUser(sessionManager.getCurrent());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         btnNo.setOnClickListener(new View.OnClickListener() {
             /**
              * When clicked it will go the next user in the feed.
@@ -158,6 +177,42 @@ public class SwipeFragment extends Fragment {
     }
 
     /**
+     * Does a JsonObjectRequest to the heroku server to favorite the selected user.
+     * @param user_id
+     * @throws JSONException
+     */
+    private void favUser(String user_id) throws JSONException {
+        String url = "http://codrrip.herokuapp.com/user/"+user_id+"/favorite";
+
+        Map<String, String> params = new HashMap();
+        params.put("target", user_id);
+
+        JSONObject jsonParams = new JSONObject(params);
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+
+        JsonObjectRequest postReq = new JsonObjectRequest(Request.Method.POST, url, jsonParams, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(TAG, "onResponse: Success");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, error.toString());
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap();
+                headers.put("Authorization", "Bearer "+sessionManager.getToken());
+                return headers;
+            }
+        };
+        requestQueue.add(postReq);
+    }
+
+    /**
      * Goes to the next user and updates the feed.
      */
     private void nextUser() {
@@ -177,17 +232,20 @@ public class SwipeFragment extends Fragment {
             public void onResponse(JSONArray response) {
                 String uName = "";
                 String uDesc = "     No users left to like!";
+                int fCount = 0;
                 try {
                     if(response.length()>0){
                         String pfp = response.getJSONObject(currentUserNum%(response.length())).getString("pfp");
                         uName = response.getJSONObject(currentUserNum%(response.length())).getString("user_id");
                         uDesc = response.getJSONObject(currentUserNum%(response.length())).getString("desc");
+                        fCount = response.getJSONObject(currentUserNum%(response.length())).getInt("fav_count");
                         setImage(pfp);
                     }
                 } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
                 sessionManager.setCurrent(uName);
+                favCount.setText(String.valueOf(fCount));
                 userName.setText(uName);
                 userDescription.setText(uDesc);
             }

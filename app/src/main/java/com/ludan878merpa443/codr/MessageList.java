@@ -6,12 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 
 public class MessageList extends ArrayAdapter {
@@ -20,6 +22,7 @@ public class MessageList extends ArrayAdapter {
     private TextView messageUser;
     private TextView message;
     private StorageReference storageReference;
+    private SessionManager sessionManager;
 
     public MessageList(Activity context, ArrayList<Pair<String, String>> message) {
         super(context, R.layout.message_item, message);
@@ -46,7 +49,7 @@ public class MessageList extends ArrayAdapter {
         storageReference = FirebaseStorage.getInstance().getReference();
         messageUser = (TextView) row.findViewById(R.id.message);
         message = (TextView) row.findViewById(R.id.messageUser);
-
+        sessionManager = new SessionManager(getContext());
         messageUser.setText(username);
         message.setText(m);
 

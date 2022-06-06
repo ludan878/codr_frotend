@@ -14,6 +14,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -98,6 +99,13 @@ public class ChatFragment extends Fragment {
         messagesView.setAdapter(messageListAdapter);
         fetchMessages();
         setUserprofile();
+        messagesView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Object message = messagesView.getItemAtPosition(i);
+                return false;
+            }
+        });
         btnUnfriend.setOnClickListener(new View.OnClickListener() {
             /**
              * Removes the like and chat from both users.
