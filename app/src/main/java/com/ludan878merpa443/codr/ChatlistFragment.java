@@ -1,5 +1,7 @@
 package com.ludan878merpa443.codr;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.DownloadManager;
 import android.app.ListActivity;
 import android.os.Bundle;
@@ -107,6 +109,7 @@ public class ChatlistFragment extends Fragment {
                     e.printStackTrace();
                 }
                 setChat(chatListAdapter.getItem(i)); // User_id from itemlist
+                Log.d(TAG, "onItemClick: "+sessionManager.getFriend());
                 getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new ChatFragment()).commit();
             }
         });
@@ -117,9 +120,9 @@ public class ChatlistFragment extends Fragment {
      * @param user_id
      */
     private void setChat(String user_id) {
+        sessionManager.setFriend(user_id);
         try {
             sessionManager.setChat(chatsJson.getString(user_id));
-            sessionManager.setFriend(user_id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -140,36 +143,9 @@ public class ChatlistFragment extends Fragment {
                         String p = "";
                         JSONObject chat = response.getJSONObject(i);
                         p = chat.getString("user_id");
+                        Log.d(TAG, "onResponse: "+chat.getString("chat_id") + p);
                         chatsJson.put(p, chat.getString("chat_id"));
-                        RequestQueue queue = Volley.newRequestQueue(getContext());
-                        String url2 = "http://codrrip.herokuapp.com/user/"+p;
-                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url2, null, new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    String user_id = response.getString("user_id");
-                                    String pfp = response.getString("pfp");
-                                    chatListAdapter.add(user_id);
-                                    Log.d("Mervan", "onResponse: "+pfp+user_id);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-
-                            }
-                        }){
-                            @Override
-                            public Map<String, String> getHeaders() throws AuthFailureError {
-                                Map<String, String> headers = new HashMap();
-                                headers.put("Authorization", "Bearer "+sessionManager.getToken());
-                                return headers;
-                            }
-                        };
-                        queue.add(jsonObjectRequest);
-
+                        chatListAdapter.add(p);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

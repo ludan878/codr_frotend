@@ -145,17 +145,16 @@ public class ChatFragment extends Fragment {
      * Sends a request to remove the desired chat and likes from the database.
      */
     private void removeChat(){
-        String url = "http://codrrip.herokuapp.com/chat/delete/"+sessionManager.getFriend();
+        String url = "http://codrrip.herokuapp.com/chat/delete/"+sessionManager.getChat();
         Map<String, String> params = new HashMap();
 
-        JSONObject jsonParams = new JSONObject(params);
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
 
         JsonArrayRequest postReq = new JsonArrayRequest(Request.Method.DELETE, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 Log.d(TAG, "onResponse: Success");
-                getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new SwipeFragment());
+                getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new ChatlistFragment()).commit();
             }
         }, new Response.ErrorListener() {
             @Override
